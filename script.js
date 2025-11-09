@@ -230,12 +230,22 @@ async function fetchGroqInsight(prompt) {
         
         // Make new AI request
         console.log('Fetching fresh AI insight from Groq...');
-        const response = await fetch(GROQ_API_URL, {
-            method: 'POST',
-            headers: {
+        
+        // Use Netlify Function if available, otherwise direct API
+        const apiUrl = window.location.hostname.includes('netlify.app') || window.location.hostname.includes('localhost')
+            ? '/.netlify/functions/groq-proxy'  // Netlify serverless function
+            : GROQ_API_URL;  // Direct API for local development
+        
+        const headers = apiUrl.includes('netlify')
+            ? { 'Content-Type': 'application/json' }  // No auth needed for proxy
+            : {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${GROQ_API_KEY}`
-            },
+                'Authorization': `Bearer ${GROQ_API_KEY}`  // Direct API needs auth
+            };
+        
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: headers,
             body: JSON.stringify({
                 model: 'llama-3.3-70b-versatile',
                 messages: [
