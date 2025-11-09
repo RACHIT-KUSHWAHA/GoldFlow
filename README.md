@@ -20,7 +20,7 @@
 
 </div>
 
-## ✨ Features at a Glance
+## ✨ Features
 
 <table>
 <tr>
@@ -35,11 +35,8 @@
 
 ### 🌍 Global Markets
 - 💎 **International Spot Prices**
-- 🇮🇳 **India** (13% markup)
-- 🇺🇸 **USA** (8% markup)
-- 🇬🇧 **UK** (20% VAT)
-- 🇦🇪 **UAE** • 🇸🇬 **Singapore** • 🇨🇳 **China**
-- 🇸🇦 **Saudi Arabia** • 🇹🇷 **Turkey**
+- 🇮🇳 India • 🇺🇸 USA • 🇬🇧 UK • 🇦🇪 UAE
+- 🇸🇬 Singapore • 🇨🇳 China • 🇸🇦 Saudi • 🇹🇷 Turkey
 
 </td>
 <td width="50%">
@@ -48,14 +45,13 @@
 - 🧠 **Groq AI** (LLaMA 3.3 70B)
 - 📈 **Market Trend Analysis**
 - 💡 **Buy/Sell/Hold Signals**
-- 🎯 **Technical Indicators**
 - ⏰ **Hourly Updates**
 
 ### 📊 Advanced Tools
-- 📉 **Interactive Charts** (Chart.js)
+- 📉 **Interactive Charts**
 - 🕐 **Multiple Timeframes**
 - 💾 **30-Day History**
-- � **CSV Export**
+- 📥 **CSV Export**
 - ⚡ **Smart Caching**
 
 </td>
@@ -65,82 +61,27 @@
 ## 🛠️ Tech Stack
 
 ```text
-Frontend    →  HTML5 • CSS3 • Vanilla JavaScript (ES6+)
+Frontend    →  HTML5 • CSS3 • Vanilla JavaScript
 Charts      →  Chart.js v4.4.0
-APIs        →  gold-api.com • Groq AI (LLaMA 3.3 70B)
+APIs        →  gold-api.com • Groq AI
 Deployment  →  Netlify (Serverless Functions)
-Storage     →  localStorage (Client-side caching)
 ```
 
 ## 🚀 Quick Start
 
-### For Users
 ```bash
-# 1. Clone the repository
+# Clone the repository
 git clone https://github.com/RACHIT-KUSHWAHA/GoldFlow.git
 
-# 2. Open in browser
+# Open in browser
 open index.html
-
-# Or use a local server
-python -m http.server 8000
 ```
 
-### For Developers (with AI Features)
+### Deploy on Netlify
 
-**Setup Groq API:**
-1. Get free API key → [console.groq.com](https://console.groq.com)
-2. Add to `script.js`:
-   ```javascript
-   const GROQ_API_KEY = 'your_key_here';
-   ```
-
-**Deploy on Netlify:**
 1. Connect your GitHub repo
-2. Add environment variable: `GROQ_API_KEY`
-3. Deploy! (Functions handle API keys securely)
-
-## 🎯 Roadmap
-
-```mermaid
-graph LR
-    A[✅ v1.0] --> B[🚧 v2.0]
-    B --> C[📋 v3.0]
-    
-    A -->|Current| D[Live Prices + AI]
-    B -->|In Progress| E[Price Alerts + PWA]
-    C -->|Planned| F[Portfolio Tracking]
-```
-
-- [ ] 🔔 Price alert notifications
-- [ ] 📱 PWA support for offline access
-- [ ] 💎 Platinum & Palladium tracking
-- [ ] 📊 Advanced technical indicators (SMA, RSI, Bollinger Bands)
-- [ ] 🌐 Multi-language support
-
----
-
-## 🤝 Contributing
-
-Love GoldFlow? **Star ⭐** this repo and contribute!
-
-```bash
-# Fork → Clone → Create Branch → Commit → Pull Request
-git checkout -b feature/YourFeature
-git commit -m "Add YourFeature"
-git push origin feature/YourFeature
-```
-
----
-
-## � Performance
-
-| Metric | Value |
-|--------|-------|
-| Load Time | < 2s |
-| API Calls | 7/hour |
-| Cache Hit Rate | ~85% |
-| Mobile Score | 95/100 |
+2. Add environment variable: `GROQ_API_KEY` (get free key at [console.groq.com](https://console.groq.com))
+3. Deploy!
 
 ---
 
@@ -150,22 +91,8 @@ git push origin feature/YourFeature
 
 MIT © 2025 [RACHIT-KUSHWAHA](https://github.com/RACHIT-KUSHWAHA)
 
----
-
-### � Support This Project
-
-If GoldFlow helped you track precious metals better, consider:
-
-⭐ **Star this repo**  •  🐛 **Report bugs**  •  💡 **Suggest features**
-
----
-
 **Built with ❤️ for precious metals enthusiasts worldwide**
 
-[![Made with JavaScript](https://img.shields.io/badge/Made%20with-JavaScript-yellow?style=flat&logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![Powered by Groq](https://img.shields.io/badge/Powered%20by-Groq%20AI-7C3AED?style=flat)](https://groq.com)
-[![Deployed on Netlify](https://img.shields.io/badge/Deployed%20on-Netlify-00C7B7?style=flat&logo=netlify)](https://netlify.com)
-
-[Report Bug](https://github.com/RACHIT-KUSHWAHA/GoldFlow/issues) • [Request Feature](https://github.com/RACHIT-KUSHWAHA/GoldFlow/issues) • [View Demo](https://your-site.netlify.app)
+⭐ [Star this repo](https://github.com/RACHIT-KUSHWAHA/GoldFlow) • 🐛 [Report Bug](https://github.com/RACHIT-KUSHWAHA/GoldFlow/issues) • 💡 [Request Feature](https://github.com/RACHIT-KUSHWAHA/GoldFlow/issues)
 
 </div>
