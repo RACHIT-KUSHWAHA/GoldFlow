@@ -201,11 +201,17 @@ Format your response EXACTLY like this with bullet points:
 Keep each bullet point concise (1-2 sentences max).`;
 
         const aiResult = await fetchGroqInsight(prompt);
-        state.aiModel = null; // Hide model label
-        return aiResult.text;
+        state.aiModel = aiResult.model || null;
+        return {
+            text: aiResult.text,
+            model: aiResult.model
+        };
     } catch (error) {
         console.error('AI Insight Error:', error);
-        return `⚠️ AI analysis temporarily unavailable. ${error.message || 'Please try refreshing or check back later.'}`;
+        return {
+            text: `⚠️ AI analysis temporarily unavailable. ${error.message || 'Please try refreshing or check back later.'}`,
+            model: null
+        };
     }
 }
 
@@ -303,10 +309,11 @@ async function updateAIInsights() {
     insightBox.innerHTML = '<div class="ai-loading"><div class="spinner"></div><p>Analyzing market data with AI...</p></div>';
 
     const insight = await getAIInsight();
-    state.aiInsight = insight;
+    state.aiInsight = insight.text;
+    state.aiModel = insight.model;
 
     // Format the insight text
-    let formattedInsight = insight
+    let formattedInsight = insight.text
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/#{1,3}\s+(.*?)(\n|$)/g, '<h3>$1</h3>')
@@ -1342,6 +1349,14 @@ Focus on: trend direction, momentum, and immediate trading signal (buy/hold/sell
 // ============================================
 
 function updateHistoryTable() {
+    const tbody = document.getElementById('historyBody');
+    
+    // Check if history table exists (it may have been removed)
+    if (!tbody) {
+        console.log('History table not found - skipping update');
+        return;
+    }
+    
     let history = getHistoricalData();
     
     // Apply filter
@@ -1350,8 +1365,6 @@ function updateHistoryTable() {
     }
     
     const recent = history.slice(-20).reverse();
-
-    const tbody = document.getElementById('historyBody');
     tbody.innerHTML = '';
 
     if (recent.length === 0) {
@@ -1556,6 +1569,9 @@ async function init() {
     await updatePrices();
 
     setTimeout(() => updateAIInsights(), 2000);
+    
+    // Initialize AI price history analysis after 5 seconds
+    setTimeout(() => refreshHistoryAnalysis(), 5000);
 
     // Set up automatic price updates every ~8.57 minutes (7 requests/hour)
     setInterval(updatePrices, GOLD_API_INTERVAL);
@@ -1707,20 +1723,266 @@ function updateStats() {
     }
 }
 
+// Share website
+function shareWebsite() {
+    const shareData = {
+        title: '💰 GoldFlow - Live Gold & Silver Prices',
+        text: 'Track precious metals prices in real-time with AI-powered market analysis!',
+        url: 'https://goldfloww.netlify.app/'
+    };
+    
+    if (navigator.share) {
+        navigator.share(shareData).catch(() => {
+            // If sharing fails, copy link to clipboard
+            copyToClipboard('https://goldfloww.netlify.app/');
+        });
+    } else {
+        // Fallback: copy to clipboard
+        copyToClipboard('https://goldfloww.netlify.app/');
+    }
+}
+
 // Share analysis
 function shareAnalysis() {
-    const text = `GoldFlow - Market Update\n\nGold: ${document.getElementById('goldPriceUSD').textContent}\nSilver: ${document.getElementById('silverPriceUSD').textContent}\nG/S Ratio: ${document.getElementById('gsRatio').textContent}\n\nCheck live prices at: ${window.location.href}`;
+    const goldPrice = document.getElementById('goldPriceUSD')?.textContent || 'Loading...';
+    const silverPrice = document.getElementById('silverPriceUSD')?.textContent || 'Loading...';
+    const gsRatio = document.getElementById('gsRatio')?.textContent || '--';
+    
+    const text = `💰 GoldFlow - Market Update\n\n🟨 Gold: ${goldPrice}\n⬜ Silver: ${silverPrice}\n📊 G/S Ratio: ${gsRatio}\n\n🔗 Check live prices: https://goldfloww.netlify.app/`;
     
     if (navigator.share) {
         navigator.share({
             title: 'GoldFlow Market Analysis',
             text: text
-        }).catch(() => {});
-    } else {
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Analysis copied to clipboard!');
+        }).catch(() => {
+            copyToClipboard(text);
         });
+    } else {
+        copyToClipboard(text);
     }
+}
+
+// Copy to clipboard helper
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('✅ Copied to clipboard!');
+    }).catch(() => {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('✅ Copied to clipboard!');
+    });
+}
+
+// Toast notification
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 2500);
+}
+
+// AI Price History Analysis
+async function refreshHistoryAnalysis() {
+    const historyBody = document.getElementById('aiHistoryBody');
+    const btn = document.getElementById('historyAnalysisBtn');
+    
+    // Show loading state
+    historyBody.innerHTML = `
+        <tr><td colspan="5" style="text-align: center;">
+            <div class="ai-loading">
+                <div class="spinner"></div>
+                <p>Analyzing price history with AI...</p>
+            </div>
+        </td></tr>
+    `;
+    
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Analyzing...';
+    }
+    
+    try {
+        // Get historical data
+        const history = getHistoricalData();
+        
+        if (!history || history.length === 0) {
+            historyBody.innerHTML = `
+                <tr><td colspan="5" style="text-align: center; color: #999;">
+                    No historical data available yet. Price data will accumulate over time.
+                </td></tr>
+            `;
+            return;
+        }
+        
+        // Group data by metal and time periods
+        const goldData = history.filter(h => h.symbol === 'XAU');
+        const silverData = history.filter(h => h.symbol === 'XAG');
+        
+        // Analyze different time periods
+        const periods = [
+            { label: 'Last Hour', minutes: 60 },
+            { label: 'Last 6 Hours', minutes: 360 },
+            { label: 'Last 24 Hours', minutes: 1440 },
+            { label: 'Last 7 Days', minutes: 10080 }
+        ];
+        
+        const analyses = [];
+        const now = Date.now();
+        
+        for (const period of periods) {
+            const cutoffTime = now - (period.minutes * 60 * 1000);
+            
+            // Analyze Gold
+            const goldPeriodData = goldData.filter(d => d.timestamp >= cutoffTime);
+            if (goldPeriodData.length > 0) {
+                const goldAnalysis = await analyzePeriod('Gold', goldPeriodData, period.label);
+                analyses.push(goldAnalysis);
+            }
+            
+            // Analyze Silver
+            const silverPeriodData = silverData.filter(d => d.timestamp >= cutoffTime);
+            if (silverPeriodData.length > 0) {
+                const silverAnalysis = await analyzePeriod('Silver', silverPeriodData, period.label);
+                analyses.push(silverAnalysis);
+            }
+        }
+        
+        // Display results
+        if (analyses.length > 0) {
+            historyBody.innerHTML = analyses.map(a => `
+                <tr>
+                    <td><strong>${a.period}</strong></td>
+                    <td>${a.metal === 'Gold' ? '🟨 Gold' : '⬜ Silver'}</td>
+                    <td>
+                        <div style="font-size: 0.9em;">
+                            <div>Low: $${a.low}</div>
+                            <div>High: $${a.high}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <span style="color: ${a.trendColor}; font-weight: bold;">
+                            ${a.trend}
+                        </span>
+                    </td>
+                    <td style="max-width: 400px;">
+                        <div style="font-size: 0.9em; line-height: 1.4;">
+                            ${a.insight}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            historyBody.innerHTML = `
+                <tr><td colspan="5" style="text-align: center; color: #999;">
+                    Insufficient data for analysis. More data will be collected over time.
+                </td></tr>
+            `;
+        }
+        
+    } catch (error) {
+        console.error('History analysis error:', error);
+        historyBody.innerHTML = `
+            <tr><td colspan="5" style="text-align: center; color: #d32f2f;">
+                Error analyzing price history. Please try again later.
+            </td></tr>
+        `;
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = '🔄 Refresh Analysis';
+        }
+    }
+}
+
+// Analyze a specific time period
+async function analyzePeriod(metal, data, periodLabel) {
+    const prices = data.map(d => d.price);
+    const low = Math.min(...prices).toFixed(2);
+    const high = Math.max(...prices).toFixed(2);
+    
+    // Calculate trend
+    const firstPrice = prices[0];
+    const lastPrice = prices[prices.length - 1];
+    const change = ((lastPrice - firstPrice) / firstPrice) * 100;
+    
+    let trend = '';
+    let trendColor = '';
+    
+    if (change > 0.5) {
+        trend = `📈 +${change.toFixed(2)}%`;
+        trendColor = '#4caf50';
+    } else if (change < -0.5) {
+        trend = `📉 ${change.toFixed(2)}%`;
+        trendColor = '#f44336';
+    } else {
+        trend = `➡️ ${change.toFixed(2)}%`;
+        trendColor = '#ff9800';
+    }
+    
+    // Calculate volatility
+    const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+    const variance = prices.reduce((sum, price) => sum + Math.pow(price - avg, 2), 0) / prices.length;
+    const volatility = Math.sqrt(variance);
+    const volatilityPercent = (volatility / avg) * 100;
+    
+    // Generate AI insight
+    let insight = '';
+    
+    try {
+        const prompt = `Analyze this ${metal} price data for ${periodLabel}:
+- Price Range: $${low} - $${high}
+- Price Change: ${change.toFixed(2)}%
+- Average Price: $${avg.toFixed(2)}
+- Volatility: ${volatilityPercent.toFixed(2)}%
+- Data Points: ${prices.length}
+
+Provide a brief 2-3 sentence market insight about this ${metal} price movement, including any notable patterns or recommendations. Be concise and professional.`;
+
+        const aiResult = await fetchGroqInsight(prompt);
+        insight = aiResult.text || aiResult; // Handle both object and string responses
+        
+    } catch (error) {
+        console.error('AI insight error:', error);
+        
+        // Fallback analysis without AI
+        if (volatilityPercent > 2) {
+            insight = `High volatility detected (${volatilityPercent.toFixed(1)}%). Price fluctuated between $${low} and $${high} during ${periodLabel.toLowerCase()}.`;
+        } else if (change > 1) {
+            insight = `${metal} showed strong upward momentum with a ${change.toFixed(2)}% increase over ${periodLabel.toLowerCase()}.`;
+        } else if (change < -1) {
+            insight = `${metal} experienced downward pressure with a ${change.toFixed(2)}% decline during ${periodLabel.toLowerCase()}.`;
+        } else {
+            insight = `${metal} traded relatively stable during ${periodLabel.toLowerCase()} with minimal price movement.`;
+        }
+    }
+    
+    return {
+        period: periodLabel,
+        metal: metal,
+        low: low,
+        high: high,
+        trend: trend,
+        trendColor: trendColor,
+        insight: insight
+    };
 }
 
 // Smooth number animation (count-up effect)

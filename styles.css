@@ -81,10 +81,61 @@ html {
     align-items: center;
     gap: 1rem;
     flex-direction: column;
+    position: relative;
 }
 
 .header-title {
     text-align: center;
+}
+
+.share-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #2d2d2d;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+.share-btn:hover {
+    background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.share-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+}
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #2d2d2d;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .header h1 {
@@ -1276,6 +1327,44 @@ table tr:hover {
     font-size: 0.875rem;
 }
 
+/* AI History Analysis Table Styles */
+#aiHistoryTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+#aiHistoryTable thead th {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #fff;
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+#aiHistoryTable tbody td {
+    padding: 14px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+}
+
+#aiHistoryTable tbody tr:hover {
+    background: #f8f8f8;
+}
+
+#aiHistoryTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+#aiHistoryTable td:nth-child(5) {
+    max-width: 400px;
+    word-wrap: break-word;
+    line-height: 1.5;
+}
+
 /* Responsive Improvements */
 @media (max-width: 1024px) {
     .container {
@@ -1296,8 +1385,9 @@ table tr:hover {
 
     .header-content {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
         gap: 1rem;
+        padding-top: 2.5rem;
     }
 
     .header-title {
@@ -1310,6 +1400,21 @@ table tr:hover {
 
     .header p {
         font-size: 0.875rem;
+    }
+    
+    .share-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .toast-notification {
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+        text-align: center;
     }
 
     .header-actions {

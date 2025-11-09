@@ -6,7 +6,7 @@
 
 **Real-time Gold & Silver prices powered by AI market analysis**
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Visit_Now-gold?style=for-the-badge)](https://your-site.netlify.app)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Visit_Now-gold?style=for-the-badge)](https://goldfloww.netlify.app/)
 [![GitHub](https://img.shields.io/badge/GitHub-Source_Code-black?style=for-the-badge&logo=github)](https://github.com/RACHIT-KUSHWAHA/GoldFlow)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 

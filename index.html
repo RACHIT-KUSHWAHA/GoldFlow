@@ -26,6 +26,9 @@
                     <h1>GoldFlow</h1>
                     <p>Live Gold & Silver Prices</p>
                 </div>
+                <button onclick="shareWebsite()" class="share-btn" title="Share GoldFlow">
+                    📤 Share
+                </button>
             </div>
         </div>
 
@@ -102,6 +105,7 @@
                             <div class="timestamp" id="silverTimestamp">--</div>
                             <div class="peak-indicator" id="silverPeak"></div>
                         </div>
+                        <div class="metal-icon">⬜</div>
                     </div>
                 </div>
             </div>
@@ -153,39 +157,37 @@
                 </div>
             </div>
 
-            <!-- History Table -->
+            <!-- AI Price History Analysis -->
             <div class="card">
                 <div class="card-header">
-                    <h2>Recent History</h2>
-                    <div class="btn-group">
-                        <button onclick="exportToCSV()" class="btn-sm">Export CSV</button>
-                        <button onclick="clearHistory()" class="btn-sm btn-danger">Clear</button>
-                    </div>
+                    <h2>🤖 AI Price History Analysis</h2>
+                    <button onclick="refreshHistoryAnalysis()" class="btn-sm" id="historyAnalysisBtn">
+                        🔄 Refresh Analysis
+                    </button>
                 </div>
-                
-                <div class="table-filters">
-                    <label>Filter by:</label>
-                    <button onclick="filterHistory('ALL')" id="filterAll" class="active">All</button>
-                    <button onclick="filterHistory('XAU')" id="filterXAU">Gold</button>
-                    <button onclick="filterHistory('XAG')" id="filterXAG">Silver</button>
-                </div>
-                
                 <div class="table-container">
-                    <table id="historyTable">
+                    <table id="aiHistoryTable">
                         <thead>
                             <tr>
-                                <th>Time</th>
+                                <th>Time Period</th>
                                 <th>Metal</th>
-                                <th>Price</th>
-                                <th>Change</th>
+                                <th>Price Range</th>
+                                <th>Trend</th>
+                                <th>AI Insight</th>
                             </tr>
                         </thead>
-                        <tbody id="historyBody">
-                            <tr><td colspan="4" style="text-align: center;">Loading...</td></tr>
+                        <tbody id="aiHistoryBody">
+                            <tr><td colspan="5" style="text-align: center;">
+                                <div class="ai-loading">
+                                    <div class="spinner"></div>
+                                    <p>Analyzing price history...</p>
+                                </div>
+                            </td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+
         </div>
 
         <!-- Footer -->
