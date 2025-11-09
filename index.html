@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>GoldFlow — Live Gold & Silver Prices</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <link rel="stylesheet" href="styles.css?v=3">
+</head>
+<body>
+    <div class="loading-indicator" id="loadingIndicator">
+        Refreshing data...
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>GoldFlow</h1>
+                    <p>Live Gold & Silver Prices</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- Current Prices -->
+        <div class="card full-width price-card">
+                <div class="card-header">
+                    <h2>Current Prices</h2>
+                    <div class="controls-row">
+                        <div class="unit-selector">
+                            <label>Market:</label>
+                            <select id="currencyDropdown" onchange="changeCurrency(this.value)" class="unit-dropdown">
+                                <optgroup label="International Spot">
+                                    <option value="USD">USA - Spot ($)</option>
+                                    <option value="EUR">Europe - Spot (€)</option>
+                                    <option value="GBP">UK - Spot (£)</option>
+                                    <option value="JPY">Japan - Spot (¥)</option>
+                                    <option value="INR">India - Spot (₹)</option>
+                                </optgroup>
+                                <optgroup label="Retail Prices (with taxes)">
+                                    <option value="INR_RETAIL">🇮🇳 India Retail (₹)</option>
+                                    <option value="USD_RETAIL">🇺🇸 USA Retail ($)</option>
+                                    <option value="GBP_RETAIL">🇬🇧 UK Retail (£)</option>
+                                    <option value="AED_RETAIL">🇦🇪 UAE Retail (AED)</option>
+                                    <option value="SGD_RETAIL">🇸🇬 Singapore Retail (S$)</option>
+                                    <option value="CNY_RETAIL">🇨🇳 China Retail (¥)</option>
+                                    <option value="SAR_RETAIL">🇸🇦 Saudi Retail (SAR)</option>
+                                    <option value="TRY_RETAIL">🇹🇷 Turkey Retail (₺)</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="unit-selector">
+                            <label>Unit:</label>
+                            <select id="unitDropdown" onchange="changeUnit(this.value)" class="unit-dropdown">
+                                <option value="g">Gram (g)</option>
+                                <option value="oz">Troy Ounce (oz t)</option>
+                                <option value="kg">Kilogram (kg)</option>
+                                <option value="tola">Tola</option>
+                                <option value="mg">Milligram (mg)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>            <div class="price-display">
+                <div class="metal-card gold-card" id="goldCard">
+                    <div class="metal-shine"></div>
+                    <div class="card-content">
+                        <div class="price-info">
+                            <h3>Gold (XAU)</h3>
+                            <div class="metal-price" id="goldPriceUSD">Loading...</div>
+                            <div class="change" id="goldChange">--</div>
+                            <div class="price-meta">
+                                <span id="goldHigh" class="meta-item" title="24-hour high price">High: --</span>
+                                <span id="goldLow" class="meta-item" title="24-hour low price">Low: --</span>
+                            </div>
+                            <div class="timestamp" id="goldTimestamp">--</div>
+                            <div class="peak-indicator" id="goldPeak"></div>
+                        </div>
+                        <div class="metal-icon">🟨</div>
+                    </div>
+                </div>
+                <div class="metal-card silver-card" id="silverCard">
+                    <div class="metal-shine"></div>
+                    <div class="card-content">
+                        <div class="price-info">
+                            <h3>Silver (XAG)</h3>
+                            <div class="metal-price" id="silverPriceUSD">Loading...</div>
+                            <div class="change" id="silverChange">--</div>
+                            <div class="price-meta">
+                                <span id="silverHigh" class="meta-item" title="24-hour high price">High: --</span>
+                                <span id="silverLow" class="meta-item" title="24-hour low price">Low: --</span>
+                            </div>
+                            <div class="timestamp" id="silverTimestamp">--</div>
+                            <div class="peak-indicator" id="silverPeak"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card stats-card">
+            <div class="card-header">
+                <h2>Market Stats</h2>
+                <button onclick="shareMarketData()" class="btn-sm">📤 Share</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-box" title="Ratio of gold price to silver price">
+                    <div class="stat-label">Gold/Silver Ratio</div>
+                    <div class="stat-value" id="gsRatio">--</div>
+                </div>
+                <div class="stat-box" title="Trading volume in last 24 hours">
+                    <div class="stat-label">24h Volume</div>
+                    <div class="stat-value" id="volume24h">High</div>
+                </div>
+                <div class="stat-box" title="Overall market direction">
+                    <div class="stat-label">Market Trend</div>
+                    <div class="stat-value" id="marketTrend">Stable</div>
+                </div>
+                <div class="stat-box" title="Price volatility indicator">
+                    <div class="stat-label">Volatility</div>
+                    <div class="stat-value" id="volatility">Low</div>
+                </div>
+            </div>
+            <div class="period-summary" id="periodSummary"></div>
+        </div>
+        <div class="main-grid">
+            <!-- AI Insights -->
+            <div class="card ai-card">
+                <div class="card-header">
+                    <h2>AI Market Analysis</h2>
+                    <div class="btn-group">
+                        <button onclick="shareAnalysis()" class="btn-sm" title="Share Analysis">📤 Share</button>
+                        <button onclick="refreshAIInsight()" class="btn-sm" id="aiRefreshBtn">
+                            🔄 Refresh
+                        </button>
+                    </div>
+                </div>
+                <div id="aiInsightBox" class="ai-insight-box">
+                    <div class="ai-loading">
+                        <div class="spinner"></div>
+                        <p>Analyzing market data with Gemini AI...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Recent History</h2>
+                    <div class="btn-group">
+                        <button onclick="exportToCSV()" class="btn-sm">Export CSV</button>
+                        <button onclick="clearHistory()" class="btn-sm btn-danger">Clear</button>
+                    </div>
+                </div>
+                
+                <div class="table-filters">
+                    <label>Filter by:</label>
+                    <button onclick="filterHistory('ALL')" id="filterAll" class="active">All</button>
+                    <button onclick="filterHistory('XAU')" id="filterXAU">Gold</button>
+                    <button onclick="filterHistory('XAG')" id="filterXAG">Silver</button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Metal</th>
+                                <th>Price</th>
+                                <th>Change</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr><td colspan="4" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <p><strong>Data Source:</strong> AI-Generated Real-time Data</p>
+                    <p class="footer-note">Last updated: <span id="lastUpdate">--</span></p>
+                </div>
+                <div class="footer-section">
+                    <p><strong>AI Powered by:</strong> Groq</p>
+                    <p class="footer-note">Advanced market analysis & predictions</p>
+                </div>
+                <div class="footer-section">
+                    <p><strong>Disclaimer:</strong></p>
+                    <p class="footer-note">Prices are for informational purposes only. Not financial advice.</p>
+                </div>
+            </div>
+            <div class="footer-stats">
+                <span>Data Points: <strong id="dataPointsCount">0</strong></span>
+                <span>•</span>
+                <span>Version: <strong>2.0 AI</strong></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=2" defer></script>
+</body>
+</html>
