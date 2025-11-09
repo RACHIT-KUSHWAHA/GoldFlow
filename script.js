@@ -1947,14 +1947,7 @@ async function analyzePeriod(metal, data, periodLabel) {
     let insight = '';
     
     try {
-        const prompt = `Analyze this ${metal} price data for ${periodLabel}:
-- Price Range: $${low} - $${high}
-- Price Change: ${change.toFixed(2)}%
-- Average Price: $${avg.toFixed(2)}
-- Volatility: ${volatilityPercent.toFixed(2)}%
-- Data Points: ${prices.length}
-
-Provide a brief 2-3 sentence market insight about this ${metal} price movement, including any notable patterns or recommendations. Be concise and professional.`;
+        const prompt = `Analyze ${metal} price for ${periodLabel}: Range $${low}-$${high}, Change ${change.toFixed(2)}%, Volatility ${volatilityPercent.toFixed(2)}%. Give 1 short sentence insight (max 15 words).`;
 
         const aiResult = await fetchGroqInsight(prompt);
         insight = aiResult.text || aiResult; // Handle both object and string responses
@@ -1964,13 +1957,13 @@ Provide a brief 2-3 sentence market insight about this ${metal} price movement, 
         
         // Fallback analysis without AI
         if (volatilityPercent > 2) {
-            insight = `High volatility detected (${volatilityPercent.toFixed(1)}%). Price fluctuated between $${low} and $${high} during ${periodLabel.toLowerCase()}.`;
+            insight = `High volatility (${volatilityPercent.toFixed(1)}%) with significant price swings.`;
         } else if (change > 1) {
-            insight = `${metal} showed strong upward momentum with a ${change.toFixed(2)}% increase over ${periodLabel.toLowerCase()}.`;
+            insight = `Strong upward momentum with ${change.toFixed(2)}% gain.`;
         } else if (change < -1) {
-            insight = `${metal} experienced downward pressure with a ${change.toFixed(2)}% decline during ${periodLabel.toLowerCase()}.`;
+            insight = `Downward pressure with ${change.toFixed(2)}% decline.`;
         } else {
-            insight = `${metal} traded relatively stable during ${periodLabel.toLowerCase()} with minimal price movement.`;
+            insight = `Stable trading with minimal movement.`;
         }
     }
     
